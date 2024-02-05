@@ -24,7 +24,7 @@ void addExercise(Workout *workout) {
     if (workout->numExercises < MAX_EXERCISES) {
         Exercise newExercise;
         printf("Enter exercise name: ");
-        scanf("%s", newExercise.exerciseName);
+        scanf("%[^\n]s", newExercise.exerciseName);
         printf("Enter sets: ");
         scanf("%d", &newExercise.sets);
         printf("Enter reps: ");
