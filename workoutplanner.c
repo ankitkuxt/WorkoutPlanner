@@ -84,7 +84,7 @@ int main() {
         switch (choice) {
             case 1:
                 // Add exercise
-                printf("Enter the index of the Day:\n 1:Monday\n 2:Tuesday\n 3:Wednesday\n 4.Thursday\n 5.Friday\n 6.Saturday\n 7.Sunday: ");
+                printf("Enter the index of the Day:\n 0:Monday\n 1:Tuesday\n 2:Wednesday\n 3.Thursday\n 4.Friday\n 5.Saturday\n 6.Sunday: ");
                 scanf("%d", &dayIndex);
 
                 if (dayIndex >= 0 && dayIndex < 7) {
