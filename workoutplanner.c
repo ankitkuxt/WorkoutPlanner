@@ -1,110 +1,159 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#define MAX_WORKOUTS 5
-#define MAX_EXERCISES 10
-#define MAX_NAME_LENGTH 50
-
-// Structure to represent an exercise
-typedef struct {
-    char exerciseName[MAX_NAME_LENGTH];
+// Structure for Exercise
+typedef struct Exercise {
+    char name[50];
     int sets;
     int reps;
+    struct Exercise *next;
 } Exercise;
 
-// Structure to represent a workout for a day
-typedef struct {
-    char day[MAX_NAME_LENGTH];
-    Exercise exercises[MAX_EXERCISES];
-    int numExercises;
-} Workout;
+// Structure for Day
+typedef struct Day {
+    char name[15];
+    Exercise *exercises;
+    struct Day *next;
+} Day;
 
-// Function to add a new exercise to a workout
-void addExercise(Workout *workout) {
-    if (workout->numExercises < MAX_EXERCISES) {
-        Exercise newExercise;
-        printf("Enter exercise name: ");
-        scanf("%[^\n]s", newExercise.exerciseName);
-        printf("Enter sets: ");
-        scanf("%d", &newExercise.sets);
-        printf("Enter reps: ");
-        scanf("%d", &newExercise.reps);
-
-        workout->exercises[workout->numExercises] = newExercise;
-        workout->numExercises++;
-
-        printf("%s added successfully!\n",newExercise.exerciseName);
-    } else {
-        printf("Cannot add more exercises for this workout.\n");
+// Function to create a new exercise node
+Exercise *createExerciseNode(char name[], int sets, int reps) {
+    Exercise *newExercise = (Exercise *)malloc(sizeof(Exercise));
+    if (newExercise == NULL) {
+        printf("Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
     }
+    strcpy(newExercise->name, name);
+    newExercise->sets = sets;
+    newExercise->reps = reps;
+    newExercise->next = NULL;
+    return newExercise;
 }
 
-// Function to display the workouts for a week
-void displayWeek(Workout week[]) {
-    printf("\nWeekly Workout Schedule:\n");
+// Function to create a new day node
+Day *createDayNode(char name[]) {
+    Day *newDay = (Day *)malloc(sizeof(Day));
+    if (newDay == NULL) {
+        printf("Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    strcpy(newDay->name, name);
+    newDay->exercises = NULL;
+    newDay->next = NULL;
+    return newDay;
+}
 
-    for (int i = 0; i < 7; i++) {
-        if (week[i].numExercises > 0) {
-            printf("\n%s Workout:\n", week[i].day);
-            for (int j = 0; j < week[i].numExercises; j++) {
-                printf("Exercise: %s\n Sets: %d\n Reps: %d\n",
-                       week[i].exercises[j].exerciseName,
-                       week[i].exercises[j].sets,
-                       week[i].exercises[j].reps);
-            }
+// Function to add an exercise to a specific day
+void addExercise(Day *head, char dayName[], char exerciseName[], int sets, int reps) {
+    Day *temp = head;
+    while (temp != NULL) {
+        if (strcmp(temp->name, dayName) == 0) {
+            Exercise *newExercise = createExerciseNode(exerciseName, sets, reps);
+            newExercise->next = temp->exercises;
+            temp->exercises = newExercise;
+            return;
         }
+        temp = temp->next;
+    }
+    printf("Day not found.\n");
+}
+
+// Function to delete an exercise from a specific day
+void deleteExercise(Day *head, char dayName[], char exerciseName[]) {
+    Day *temp = head;
+    while (temp != NULL) {
+        if (strcmp(temp->name, dayName) == 0) {
+            Exercise *prev = NULL;
+            Exercise *curr = temp->exercises;
+            while (curr != NULL) {
+                if (strcmp(curr->name, exerciseName) == 0) {
+                    if (prev == NULL)
+                        temp->exercises = curr->next;
+                    else
+                        prev->next = curr->next;
+                    free(curr);
+                    printf("Exercise deleted successfully.\n");
+                    return;
+                }
+                prev = curr;
+                curr = curr->next;
+            }
+            printf("Exercise not found.\n");
+            return;
+        }
+        temp = temp->next;
+    }
+    printf("Day not found.\n");
+}
+
+// Function to display all exercises for each day
+void display(Day *head) {
+    Day *temp = head;
+    while (temp != NULL) {
+        printf("Day: %s\n", temp->name);
+        Exercise *exercise = temp->exercises;
+        while (exercise != NULL) {
+            printf(" - %s (Sets: %d, Reps: %d)\n", exercise->name, exercise->sets, exercise->reps);
+            exercise = exercise->next;
+        }
+        temp = temp->next;
     }
 }
 
 int main() {
-    // Array to store workouts for each day of the week
-    Workout week[7];
-
     // Initialize days of the week
-    char daysOfWeek[7][MAX_NAME_LENGTH] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-
-    // Populate week array with days of the week
-    for (int i = 0; i < 7; i++) {
-        strcpy(week[i].day, daysOfWeek[i]);
-        week[i].numExercises = 0;
-    }
+    Day *head = createDayNode("Monday");
+    head->next = createDayNode("Tuesday");
+    head->next->next = createDayNode("Wednesday");
+    head->next->next->next = createDayNode("Thursday");
+    head->next->next->next->next = createDayNode("Friday");
+    head->next->next->next->next->next = createDayNode("Saturday");
+    head->next->next->next->next->next->next = createDayNode("Sunday");
 
     int choice;
-    int dayIndex;
+    char dayName[15];
+    char exerciseName[50];
+    int sets, reps;
 
     do {
-        // Display menu
-        printf("\nMenu:\n");
+        printf("\nWeekly Workout Planner\n");
         printf("1. Add Exercise\n");
-        printf("2. Display Weekly Schedule\n");
-        printf("3. Exit\n");
+        printf("2. Delete Exercise\n");
+        printf("3. Display Exercises\n");
+        printf("4. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
             case 1:
-                // Add exercise
-                printf("Enter the index of the Day:\n 0:Monday\n 1:Tuesday\n 2:Wednesday\n 3.Thursday\n 4.Friday\n 5.Saturday\n 6.Sunday: ");
-                scanf("%d", &dayIndex);
-
-                if (dayIndex >= 0 && dayIndex < 7) {
-                    addExercise(&week[dayIndex]);
-                } else {
-                    printf("Invalid day index.\n");
-                }
+                printf("Enter day name (e.g., Monday): ");
+                scanf("%s", dayName);
+                printf("Enter exercise name: ");
+                scanf("%s", exerciseName);
+                printf("Enter number of sets: ");
+                scanf("%d", &sets);
+                printf("Enter number of reps: ");
+                scanf("%d", &reps);
+                addExercise(head, dayName, exerciseName, sets, reps);
                 break;
             case 2:
-                // Display weekly schedule
-                displayWeek(week);
+                printf("Enter day name (e.g., Monday): ");
+                scanf("%s", dayName);
+                printf("Enter exercise name: ");
+                scanf("%s", exerciseName);
+                deleteExercise(head, dayName, exerciseName);
                 break;
             case 3:
-                // Exit the program
-                printf("Exiting program.\n");
+                display(head);
+                break;
+            case 4:
+                printf("Exiting program...\n");
                 break;
             default:
-                printf("Invalid choice. Please try again.\n");
+                printf("Invalid choice. Please enter again.\n");
         }
-    } while (choice != 3);
+    } while (choice != 4);
 
     return 0;
 }
