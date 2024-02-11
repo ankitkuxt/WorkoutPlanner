@@ -17,6 +17,13 @@ typedef struct Day {
     struct Day *next;
 } Day;
 
+// Structure for User
+typedef struct User {
+    char username[50];
+    Day *days;
+    struct User *next;
+} User;
+
 // Function to create a new exercise node
 Exercise *createExerciseNode(char name[], int sets, int reps) {
     Exercise *newExercise = (Exercise *)malloc(sizeof(Exercise));
@@ -42,6 +49,19 @@ Day *createDayNode(char name[]) {
     newDay->exercises = NULL;
     newDay->next = NULL;
     return newDay;
+}
+
+// Function to create a new user node
+User *createUserNode(char username[]) {
+    User *newUser = (User *)malloc(sizeof(User));
+    if (newUser == NULL) {
+        printf("Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    strcpy(newUser->username, username);
+    newUser->days = NULL;
+    newUser->next = NULL;
+    return newUser;
 }
 
 // Function to add an exercise to a specific day
@@ -101,7 +121,22 @@ void display(Day *head) {
     }
 }
 
+// Function to add a new user
+User *addUser(User *head, char username[]) {
+    User *newUser = createUserNode(username);
+    newUser->next = head;
+    return newUser;
+}
+
 int main() {
+    // Initialize user
+    User *user = NULL;
+    char username[50];
+
+    printf("Enter your username: ");
+    scanf("%s", username);
+    user = addUser(user, username);
+
     // Initialize days of the week
     Day *head = createDayNode("Monday");
     head->next = createDayNode("Tuesday");
