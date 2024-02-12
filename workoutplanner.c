@@ -104,7 +104,7 @@ void deleteExercise(Day *head, char dayName[], char exerciseName[]) {
         }
         temp = temp->next;
     }
-    printf("Day not found.\n");
+    printf("Exercise not added on this day of your Routine.\n");
 }
 
 // Function to display all exercises for each day
@@ -130,12 +130,9 @@ User *addUser(User *head, char username[]) {
 
 int main() {
     // Initialize user
-    User *user = NULL;
+    User *users = NULL;
     char username[50];
 
-    printf("Enter your username: ");
-    scanf("%s", username);
-    user = addUser(user, username);
 
     // Initialize days of the week
     Day *head = createDayNode("Monday");
@@ -146,6 +143,8 @@ int main() {
     head->next->next->next->next->next = createDayNode("Saturday");
     head->next->next->next->next->next->next = createDayNode("Sunday");
 
+    //users->days = head;
+
     int choice;
     char dayName[15];
     char exerciseName[50];
@@ -153,15 +152,20 @@ int main() {
 
     do {
         printf("\nWeekly Workout Planner\n");
-        printf("1. Add Exercise\n");
-        printf("2. Delete Exercise\n");
-        printf("3. Display Exercises\n");
-        printf("4. Exit\n");
+        printf("1. Enter New Username\n");
+        printf("2. Add Exercise\n");
+        printf("3. Delete Exercise\n");
+        printf("4. Display Exercises\n");
+        printf("5. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
-            case 1:
+            case 1: printf("Enter your username: ");
+                    scanf("%s", username);
+                    users = addUser(users, username);
+                    break;
+            case 2:
                 printf("Enter day name (e.g., Monday): ");
                 scanf("%s", dayName);
                 printf("Enter exercise name: ");
@@ -172,23 +176,23 @@ int main() {
                 scanf("%d", &reps);
                 addExercise(head, dayName, exerciseName, sets, reps);
                 break;
-            case 2:
+            case 3:
                 printf("Enter day name (e.g., Monday): ");
                 scanf("%s", dayName);
                 printf("Enter exercise name: ");
                 scanf("%s", exerciseName);
                 deleteExercise(head, dayName, exerciseName);
                 break;
-            case 3:
+            case 4:
                 display(head);
                 break;
-            case 4:
+            case 5:
                 printf("Exiting program...\n");
                 break;
             default:
                 printf("Invalid choice. Please enter again.\n");
         }
-    } while (choice != 4);
+    } while (choice != 5);
 
     return 0;
 }
