@@ -18,11 +18,14 @@ typedef struct Day {
 } Day;
 
 // Structure for User
-typedef struct User {
+struct User currentUser;
+struct User {
     char username[50];
-    Day *days;
-    struct User *next;
+    char password[50];
+    //Day *days;
+    //struct User *next;
 } User;
+
 
 // Function to create a new exercise node
 Exercise *createExerciseNode(char name[], int sets, int reps) {
@@ -52,7 +55,7 @@ Day *createDayNode(char name[]) {
 }
 
 // Function to create a new user node
-User *createUserNode(char username[]) {
+/*User *createUserNode(char username[]) {
     User *newUser = (User *)malloc(sizeof(User));
     if (newUser == NULL) {
         printf("Memory allocation failed.\n");
@@ -62,7 +65,7 @@ User *createUserNode(char username[]) {
     newUser->days = NULL;
     newUser->next = NULL;
     return newUser;
-}
+}*/
 
 // Function to add an exercise to a specific day
 void addExercise(Day *head, char dayName[], char exerciseName[], int sets, int reps) {
@@ -121,17 +124,50 @@ void display(Day *head) {
     }
 }
 
+void signUp(){
+    struct User newUser;
+    printf("Enter your username:");
+    scanf("%s",newUser.username);
+    printf("Enter your password:");
+    scanf("%s",newUser.password);
+
+    FILE *file = fopen("users.txt","a");
+    fprintf(file,"%s %s\n",newUser.username,newUser.password);
+    fclose(file);
+
+    printf("Account created successfully!\n");
+}
+
+int userExists(char *username, char *password){
+    FILE *file = fopen("users.txt","r");
+    if(file == NULL){
+        return 0;
+    }
+
+    char storedUsername[50];
+    char storedPassword[50];
+    while(fscanf(file, "%s %s\n", storedUsername, storedPassword) != EOF){
+        if(strcmp(username, storedUsername) == 0 && strcmp(password, storedPassword) == 0){
+            fclose(file);
+            return 1;
+
+        }
+    }
+    fclose(file);
+    return 0;
+}
+
 // Function to add a new user
-User *addUser(User *head, char username[]) {
+/*User *addUser(User *head, char username[]) {
     User *newUser = createUserNode(username);
     newUser->next = head;
     return newUser;
-}
+}*/
 
 int main() {
     // Initialize user
-    User *users = NULL;
-    char username[50];
+    //User *users = NULL;
+    //char username[50];
 
 
     // Initialize days of the week
@@ -149,23 +185,54 @@ int main() {
     char dayName[15];
     char exerciseName[50];
     int sets, reps;
+   int loggedIn = 0;
 
-    do {
-        printf("\nWeekly Workout Planner\n");
-        printf("1. Enter New Username\n");
-        printf("2. Add Exercise\n");
-        printf("3. Delete Exercise\n");
-        printf("4. Display Exercises\n");
-        printf("5. Exit\n");
+    while(1){
+        if(!loggedIn){
+            printf("Welcome to Workout Planner\n");
+            printf("1. Login\n");
+            printf("2. SignUp\n");
+            printf("3. Exit\n");
+            printf("Enter Your Choice: ");
+            scanf("%d", &choice);
+
+            switch(choice){
+        case 1:
+            printf("Enter your Username: ");
+            scanf("%s", currentUser.username);
+            printf("Enter your password: ");
+            scanf("%s", currentUser.password);
+
+            if(userExists(currentUser.username, currentUser.password)){
+                printf("Login Successful!\n");
+                loggedIn = 1;
+            }
+            else{
+                printf("PLEASE SIGN UP IF YOU ARE A NEW USER\n");
+            }
+            break;
+
+        case 2:
+            signUp();
+            break;
+        case 3:
+            printf("Exiting the program.\n");
+            exit(0);
+
+        default:
+            printf("invalid choice. TRY AGAIN!!");
+        }
+    }
+    else{
+        printf("1. Add Exercise\n");
+        printf("2. Delete Exercise\n");
+        printf("3. Display Exercises\n");
+        printf("4. Logout\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
-            case 1: printf("Enter your username: ");
-                    scanf("%s", username);
-                    users = addUser(users, username);
-                    break;
-            case 2:
+            case 1:
                 printf("Enter day name (e.g., Monday): ");
                 scanf("%s", dayName);
                 printf("Enter exercise name: ");
@@ -176,23 +243,27 @@ int main() {
                 scanf("%d", &reps);
                 addExercise(head, dayName, exerciseName, sets, reps);
                 break;
-            case 3:
+            case 2:
                 printf("Enter day name (e.g., Monday): ");
                 scanf("%s", dayName);
                 printf("Enter exercise name: ");
                 scanf("%s", exerciseName);
                 deleteExercise(head, dayName, exerciseName);
                 break;
-            case 4:
+            case 3:
                 display(head);
                 break;
-            case 5:
-                printf("Exiting program...\n");
+            case 4:
+                printf("Logging out...\n");
+                loggedIn = 0;
                 break;
             default:
                 printf("Invalid choice. Please enter again.\n");
         }
-    } while (choice != 5);
-
+    }
+    }
     return 0;
+
 }
+
+
