@@ -54,19 +54,6 @@ Day *createDayNode(char name[]) {
     return newDay;
 }
 
-// Function to create a new user node
-/*User *createUserNode(char username[]) {
-    User *newUser = (User *)malloc(sizeof(User));
-    if (newUser == NULL) {
-        printf("Memory allocation failed.\n");
-        exit(EXIT_FAILURE);
-    }
-    strcpy(newUser->username, username);
-    newUser->days = NULL;
-    newUser->next = NULL;
-    return newUser;
-}*/
-
 // Function to add an exercise to a specific day
 void addExercise(Day *head, char dayName[], char exerciseName[], int sets, int reps) {
     Day *temp = head;
@@ -157,18 +144,7 @@ int userExists(char *username, char *password){
     return 0;
 }
 
-// Function to add a new user
-/*User *addUser(User *head, char username[]) {
-    User *newUser = createUserNode(username);
-    newUser->next = head;
-    return newUser;
-}*/
-
 int main() {
-    // Initialize user
-    //User *users = NULL;
-    //char username[50];
-
 
     // Initialize days of the week
     Day *head = createDayNode("Monday");
@@ -263,7 +239,6 @@ int main() {
     }
     }
     return 0;
-
 }
 
 
